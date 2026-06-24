@@ -26,4 +26,7 @@ Estimated monthly savings: $867.00
 | Reports | `cost_optimizer/reporting.py` | JSON, Markdown and HTML output. |
 | AWS adapter | `cost_optimizer/aws.py` | Optional Boto3 inventory collection path. |
 | Sample inventory | `examples/sample_inventory.json` | Offline recruiter-safe demo input. |
-| Runbook | `docs/RUNBOOK.md` | Weekly review, deletion safety and tagging policy. |
+| Docker demo | `Dockerfile` | Containerized CLI that runs without AWS credentials. |
+| Docker Smoke | `.github/workflows/docker-smoke.yml` | Container build and sample report execution in CI. |
+| Runbook | `docs/runbook.md` | Weekly review, deletion safety and tagging policy. |
+| Security scan | `scripts/security_scan.py` | Read-only guardrail and secret-pattern check. |

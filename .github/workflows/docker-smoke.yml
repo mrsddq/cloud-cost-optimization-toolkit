@@ -1,0 +1,39 @@
+name: Docker Smoke
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - Dockerfile
+      - docker-compose.yml
+      - cost_optimizer/**
+      - config/**
+      - examples/**
+      - pyproject.toml
+      - .github/workflows/docker-smoke.yml
+  push:
+    branches: [main]
+    paths:
+      - Dockerfile
+      - docker-compose.yml
+      - cost_optimizer/**
+      - config/**
+      - examples/**
+      - pyproject.toml
+      - .github/workflows/docker-smoke.yml
+
+permissions:
+  contents: read
+
+jobs:
+  docker-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build CLI image
+        run: docker build -t cloud-cost-optimizer:smoke .
+      - name: Run default report
+        run: docker run --rm cloud-cost-optimizer:smoke
+      - name: Render JSON report
+        run: docker run --rm cloud-cost-optimizer:smoke --inventory examples/sample_inventory.json --format json --dry-run

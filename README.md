@@ -14,6 +14,8 @@ The default demo mode runs entirely from a sample inventory file, so reviewers c
 - Optional Boto3 collection path for real AWS accounts
 - Checks for idle EC2, unattached EBS, old snapshots, unused load balancers, untagged resources, and oversizing
 - Slack and email notification helpers
+- Dockerized local demo and Docker Smoke CI
+- Read-only security scan that blocks committed secrets and mutating AWS calls
 - Unit tests for checks, reporting, and CLI behavior
 
 ## Quick Start
@@ -39,9 +41,41 @@ Run tests:
 make test
 ```
 
+Docker demo:
+
+```bash
+docker compose up --build
+```
+
 ## Portfolio Evidence
 
 See [docs/PORTFOLIO_EVIDENCE.md](docs/PORTFOLIO_EVIDENCE.md) for sample report output, validation commands, and FinOps proof points.
+
+## Production Docs
+
+- [Architecture](docs/architecture.md)
+- [Runbook](docs/runbook.md)
+- [Incident response](docs/incident-response.md)
+- [Cost estimate](docs/cost-estimate.md)
+- [Security controls](docs/security-controls.md)
+
+## Make Targets
+
+```bash
+make test
+make validate
+make lint
+make security-scan
+make local-demo
+make deploy
+make destroy
+```
+
+`deploy` and `destroy` are intentionally no-op guardrails because the toolkit is read-only by default.
+
+## Interview Story
+
+This project demonstrates Python automation for AWS cost governance, safe dry-run reporting, Dockerized execution, CI validation, read-only security guardrails, stakeholder-friendly reports and production-style review runbooks.
 
 ## Example Findings
 
@@ -82,3 +116,7 @@ python -m cost_optimizer.cli --from-aws --region us-east-1 --format markdown --d
 ```
 
 Use read-only IAM permissions first. Do not add cleanup actions until findings are reviewed.
+
+## Cost And Safety Note
+
+The sample inventory mode is free. AWS mode should run with read-only permissions, account allowlists, tagged ownership, reviewed thresholds and durable report storage before any cleanup workflow is added.

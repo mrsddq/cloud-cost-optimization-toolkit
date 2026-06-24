@@ -1,0 +1,11 @@
+.git
+.github
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+sample-report.html
+report.html
+outputs/

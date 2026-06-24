@@ -8,12 +8,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run tests
-        run: make test
-      - name: Render sample report
-        run: make sample-markdown
+      - name: Validate CLI and reports
+        run: make validate
+      - name: Lint Python files
+        run: make lint
+      - name: Security scan
+        run: make security-scan

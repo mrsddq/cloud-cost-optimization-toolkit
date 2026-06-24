@@ -1,0 +1,9 @@
+services:
+  cost-audit:
+    build: .
+    command:
+      - --inventory
+      - examples/sample_inventory.json
+      - --format
+      - markdown
+      - --dry-run
