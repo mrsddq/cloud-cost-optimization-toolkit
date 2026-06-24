@@ -1,5 +1,7 @@
 # Cloud Cost Optimization Toolkit
 
+[![CI](https://github.com/mrsddq/cloud-cost-optimization-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/mrsddq/cloud-cost-optimization-toolkit/actions/workflows/ci.yml)
+
 Python toolkit for finding common AWS waste: idle EC2 instances, unattached EBS volumes, old snapshots, unused load balancers, missing tags, and oversized instances.
 
 The default demo mode runs entirely from a sample inventory file, so reviewers can test it without AWS credentials.
@@ -36,6 +38,10 @@ Run tests:
 ```bash
 make test
 ```
+
+## Portfolio Evidence
+
+See [docs/PORTFOLIO_EVIDENCE.md](docs/PORTFOLIO_EVIDENCE.md) for sample report output, validation commands, and FinOps proof points.
 
 ## Example Findings
 
