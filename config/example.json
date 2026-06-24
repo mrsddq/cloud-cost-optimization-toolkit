@@ -1,0 +1,12 @@
+{
+  "idle_cpu_threshold": 5.0,
+  "rightsize_cpu_threshold": 15.0,
+  "old_snapshot_days": 90,
+  "required_tags": ["Owner", "CostCenter", "Environment"],
+  "rightsize_recommendations": {
+    "m5.4xlarge": "m5.xlarge",
+    "m5.2xlarge": "m5.large",
+    "c5.4xlarge": "c5.xlarge",
+    "r5.4xlarge": "r5.xlarge"
+  }
+}

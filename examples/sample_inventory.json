@@ -1,0 +1,68 @@
+{
+  "instances": [
+    {
+      "id": "i-0123456789idle",
+      "region": "us-east-1",
+      "type": "m5.4xlarge",
+      "state": "running",
+      "cpu_avg_14d": 3.2,
+      "monthly_cost": 560.0,
+      "tags": {
+        "Owner": "platform",
+        "Environment": "dev"
+      }
+    },
+    {
+      "id": "i-0123456789healthy",
+      "region": "us-east-1",
+      "type": "t3.large",
+      "state": "running",
+      "cpu_avg_14d": 42.0,
+      "monthly_cost": 60.0,
+      "tags": {
+        "Owner": "api-team",
+        "CostCenter": "prod",
+        "Environment": "prod"
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "id": "vol-0unused",
+      "region": "us-east-1",
+      "state": "available",
+      "attached_to": null,
+      "size_gb": 250,
+      "monthly_cost": 25.0,
+      "tags": {
+        "Owner": "unknown"
+      }
+    }
+  ],
+  "snapshots": [
+    {
+      "id": "snap-0old",
+      "region": "us-east-1",
+      "age_days": 180,
+      "monthly_cost": 8.0,
+      "tags": {
+        "Owner": "platform",
+        "CostCenter": "devops-lab",
+        "Environment": "dev"
+      }
+    }
+  ],
+  "load_balancers": [
+    {
+      "id": "app/unused-lb/123",
+      "region": "us-east-1",
+      "request_count_7d": 0,
+      "healthy_target_count": 0,
+      "monthly_cost": 22.0,
+      "tags": {
+        "Owner": "platform",
+        "Environment": "stage"
+      }
+    }
+  ]
+}

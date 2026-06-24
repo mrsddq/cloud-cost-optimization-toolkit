@@ -1,0 +1,9 @@
+__pycache__/
+.pytest_cache/
+.venv/
+dist/
+*.egg-info/
+report.html
+report.json
+report.md
+.DS_Store

@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloud-cost-optimization-toolkit"
+version = "0.1.0"
+description = "AWS cost optimization checks with dry-run reporting."
+requires-python = ">=3.11"
+authors = [{ name = "Laraib" }]
+dependencies = []
+
+[project.optional-dependencies]
+aws = ["boto3>=1.34"]
+
+[project.scripts]
+cloud-cost-audit = "cost_optimizer.cli:main"
