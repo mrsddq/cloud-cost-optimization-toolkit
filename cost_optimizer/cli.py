@@ -43,6 +43,12 @@ def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
     config = {**DEFAULT_CONFIG, **(load_json(args.config) if args.config else {})}
     inventory = collect_inventory(args.region) if args.from_aws else load_json(args.inventory)
+    if args.from_aws:
+        sys.stderr.write(
+            "AWS coverage: inventory, snapshot age, and tags only. CPU, traffic, "
+            "target health, and pricing are not collected; their checks/estimates "
+            "are unavailable. No findings does not mean no waste.\n"
+        )
     findings = run_all_checks(inventory, config)
     rendered = render(findings, args.format, dry_run=args.dry_run)
 

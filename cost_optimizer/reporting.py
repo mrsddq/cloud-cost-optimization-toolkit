@@ -7,7 +7,12 @@ from .models import Finding
 
 
 def total_savings(findings: list[Finding]) -> float:
-    return round(sum(item.estimated_monthly_savings for item in findings), 2)
+    # Stopping and rightsizing one instance are alternative actions, not additive.
+    by_resource: dict[tuple[str, str, str], float] = {}
+    for item in findings:
+        key = (item.region, item.resource_type, item.resource_id)
+        by_resource[key] = max(by_resource.get(key, 0.0), item.estimated_monthly_savings)
+    return round(sum(by_resource.values()), 2)
 
 
 def render_json(findings: list[Finding]) -> str:

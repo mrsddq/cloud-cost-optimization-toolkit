@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from .models import Finding
@@ -37,7 +38,9 @@ def find_idle_ec2(instances: list[dict[str, Any]], config: dict[str, Any]) -> li
     for instance in instances:
         if instance.get("state") != "running":
             continue
-        cpu = float(instance.get("cpu_avg_14d", 0))
+        cpu = _nonnegative_metric(instance.get("cpu_avg_14d"))
+        if cpu is None or cpu > 100:
+            continue
         if cpu <= threshold:
             findings.append(
                 Finding(
@@ -59,7 +62,7 @@ def find_idle_ec2(instances: list[dict[str, Any]], config: dict[str, Any]) -> li
 def find_unattached_ebs(volumes: list[dict[str, Any]]) -> list[Finding]:
     findings = []
     for volume in volumes:
-        if volume.get("state") == "available" or not volume.get("attached_to"):
+        if volume.get("state") == "available" and not volume.get("attached_to"):
             findings.append(
                 Finding(
                     check_id="unattached-ebs",
@@ -103,8 +106,8 @@ def find_old_snapshots(snapshots: list[dict[str, Any]], config: dict[str, Any]) 
 def find_unused_load_balancers(load_balancers: list[dict[str, Any]]) -> list[Finding]:
     findings = []
     for load_balancer in load_balancers:
-        requests = int(load_balancer.get("request_count_7d", 0))
-        targets = int(load_balancer.get("healthy_target_count", 0))
+        requests = _nonnegative_metric(load_balancer.get("request_count_7d"))
+        targets = _nonnegative_metric(load_balancer.get("healthy_target_count"))
         if requests == 0 or targets == 0:
             findings.append(
                 Finding(
@@ -129,7 +132,9 @@ def find_oversized_instances(instances: list[dict[str, Any]], config: dict[str, 
     recommendations = config["rightsize_recommendations"]
     for instance in instances:
         instance_type = instance.get("type")
-        cpu = float(instance.get("cpu_avg_14d", 0))
+        cpu = _nonnegative_metric(instance.get("cpu_avg_14d"))
+        if cpu is None or cpu > 100:
+            continue
         if instance.get("state") == "running" and instance_type in recommendations and cpu <= threshold:
             monthly_cost = float(instance.get("monthly_cost", 0))
             findings.append(
@@ -161,6 +166,8 @@ def find_missing_tags(inventory: dict[str, Any], config: dict[str, Any]) -> list
     for resource_type, resources in collections.items():
         for resource in resources:
             tags = resource.get("tags", {})
+            if tags is None:
+                continue  # Unknown tags are not evidence of missing tags.
             missing = sorted(required - set(tags))
             if missing:
                 findings.append(
@@ -177,3 +184,14 @@ def find_missing_tags(inventory: dict[str, Any], config: dict[str, Any]) -> list
                     )
                 )
     return findings
+
+
+def _nonnegative_metric(value: Any) -> float | None:
+    """Missing, malformed, and non-finite observations cannot establish idleness."""
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        metric = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return metric if math.isfinite(metric) and metric >= 0 else None

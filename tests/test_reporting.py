@@ -33,5 +33,20 @@ class ReportingTest(unittest.TestCase):
         self.assertIn("i-idle", render_html(self.findings))
 
 
+class SavingsAggregationTest(unittest.TestCase):
+    def test_alternative_actions_do_not_double_count_the_same_resource(self):
+        from dataclasses import replace
+        idle = Finding("idle-ec2", "high", "ec2", "i-1", "us-east-1", "", "", 100)
+        resize = replace(idle, check_id="oversized-instance", estimated_monthly_savings=45)
+        self.assertEqual(total_savings([idle, resize]), 100)
+        self.assertEqual(total_savings([resize, idle, idle]), 100)
+        self.assertEqual(json.loads(render_json([idle, resize]))["estimated_monthly_savings"], 100)
+
+    def test_different_resource_and_region_savings_are_additive(self):
+        from dataclasses import replace
+        idle = Finding("idle-ec2", "high", "ec2", "i-1", "us-east-1", "", "", 100)
+        self.assertEqual(total_savings([idle, replace(idle, region="us-west-2"), replace(idle, resource_id="i-2")]), 300)
+
+
 if __name__ == "__main__":
     unittest.main()
