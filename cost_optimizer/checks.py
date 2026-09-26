@@ -51,7 +51,7 @@ def find_idle_ec2(instances: list[dict[str, Any]], config: dict[str, Any]) -> li
                     region=instance.get("region", "unknown"),
                     message=f"EC2 instance averaged {cpu:.1f}% CPU over 14 days.",
                     recommendation="Stop, schedule, terminate, or rightsize after owner review.",
-                    estimated_monthly_savings=float(instance.get("monthly_cost", 0)),
+                    estimated_monthly_savings=_nonnegative_metric(instance.get("monthly_cost")) or 0.0,
                     tags=instance.get("tags", {}),
                     metadata={"cpu_avg_14d": cpu, "instance_type": instance.get("type")},
                 )
@@ -72,7 +72,7 @@ def find_unattached_ebs(volumes: list[dict[str, Any]]) -> list[Finding]:
                     region=volume.get("region", "unknown"),
                     message="EBS volume is not attached to an instance.",
                     recommendation="Snapshot if needed, then delete after owner approval.",
-                    estimated_monthly_savings=float(volume.get("monthly_cost", 0)),
+                    estimated_monthly_savings=_nonnegative_metric(volume.get("monthly_cost")) or 0.0,
                     tags=volume.get("tags", {}),
                     metadata={"size_gb": volume.get("size_gb")},
                 )
@@ -95,7 +95,7 @@ def find_old_snapshots(snapshots: list[dict[str, Any]], config: dict[str, Any]) 
                     region=snapshot.get("region", "unknown"),
                     message=f"Snapshot is {age} days old, above {max_age}-day policy.",
                     recommendation="Confirm retention requirement, then delete if obsolete.",
-                    estimated_monthly_savings=float(snapshot.get("monthly_cost", 0)),
+                    estimated_monthly_savings=_nonnegative_metric(snapshot.get("monthly_cost")) or 0.0,
                     tags=snapshot.get("tags", {}),
                     metadata={"age_days": age},
                 )
@@ -118,7 +118,7 @@ def find_unused_load_balancers(load_balancers: list[dict[str, Any]]) -> list[Fin
                     region=load_balancer.get("region", "unknown"),
                     message="Load balancer has no traffic or no healthy targets.",
                     recommendation="Confirm ownership, then remove unused listener and load balancer resources.",
-                    estimated_monthly_savings=float(load_balancer.get("monthly_cost", 0)),
+                    estimated_monthly_savings=_nonnegative_metric(load_balancer.get("monthly_cost")) or 0.0,
                     tags=load_balancer.get("tags", {}),
                     metadata={"request_count_7d": requests, "healthy_target_count": targets},
                 )
@@ -136,7 +136,7 @@ def find_oversized_instances(instances: list[dict[str, Any]], config: dict[str, 
         if cpu is None or cpu > 100:
             continue
         if instance.get("state") == "running" and instance_type in recommendations and cpu <= threshold:
-            monthly_cost = float(instance.get("monthly_cost", 0))
+            monthly_cost = _nonnegative_metric(instance.get("monthly_cost")) or 0.0
             findings.append(
                 Finding(
                     check_id="oversized-instance",

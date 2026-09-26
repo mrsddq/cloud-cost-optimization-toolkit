@@ -45,6 +45,19 @@ class ChecksTest(unittest.TestCase):
 
 
 class MissingEvidenceTest(unittest.TestCase):
+    def test_invalid_costs_preserve_findings_without_inventing_savings(self):
+        for cost in (None, "", "unknown", float("nan"), float("inf"), -1, False):
+            with self.subTest(cost=cost):
+                inventory = {
+                    "instances": [{"id": "i-1", "state": "running", "type": "m5.4xlarge", "cpu_avg_14d": 0, "monthly_cost": cost}],
+                    "volumes": [{"id": "vol-1", "state": "available", "monthly_cost": cost}],
+                    "snapshots": [{"id": "snap-1", "age_days": 100, "monthly_cost": cost}],
+                    "load_balancers": [{"id": "lb-1", "request_count_7d": 0, "monthly_cost": cost}],
+                }
+                findings = run_all_checks(inventory)
+                self.assertEqual(len([f for f in findings if f.check_id != "missing-tags"]), 5)
+                self.assertTrue(all(f.estimated_monthly_savings == 0 for f in findings))
+
     def test_unknown_and_invalid_cpu_never_create_savings_findings(self):
         for value in (None, "", "not-a-number", float("nan"), float("inf"), -1, 101, False):
             with self.subTest(value=value):
